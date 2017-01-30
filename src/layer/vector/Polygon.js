@@ -89,6 +89,37 @@ L.Polygon = L.Polyline.extend({
 		return this._map.layerPointToLatLng(center);
 	},
 
+	// @method contains (latlng: LatLng): Boolean
+	// Returns `true` if `latlng` is inside the (multi)polygon. All
+	// computations are performed on projected points so the polygon has
+	// to be added to a map beforehand.
+	contains: function (latlng) {
+		latlng = L.latLng(latlng);
+		var inside = false;
+		if (!this.isEmpty() && this.getBounds().contains(latlng)) {
+			var latlngs = this._latlngs;
+			if (L.Polyline._flat(latlngs[0])) {
+				// Describe single polygons as a multi-polygons with one element
+				latlngs = [latlngs];
+			}
+			for (var i = 0, len = latlngs.length; !inside && i < len; i++) {
+				inside = this._singleContains(latlngs[i], latlng);
+			}
+		}
+		return inside;
+	},
+
+	_singleContains: function (latlngs, latlng) {
+		// Deal with latlngs describing a _single_ polygon, start by checking first ring
+		var contained = L.PolyUtil.ringContains(latlngs[0], latlng, this._map);
+
+		for (var i = 1, len = latlngs.length; contained && i < len; ++i) {
+			// Check holes
+			contained = contained && !L.PolyUtil.ringContains(latlngs[i], latlng, this._map);
+		}
+		return contained;
+	},
+
 	_convertLatLngs: function (latlngs) {
 		var result = L.Polyline.prototype._convertLatLngs.call(this, latlngs),
 		    len = result.length;

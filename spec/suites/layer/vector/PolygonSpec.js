@@ -325,4 +325,113 @@ describe('Polygon', function () {
 
 	});
 
+	describe('#contains', function () {
+
+		var latlngs = [
+			[[3, 1], [1, 3], [1, 7], [3, 5], [5, 7], [7, 5], [7, 3], [5, 1]],
+			[[4, 3], [3, 4], [5, 4]]
+		];
+
+		var polygon = new L.Polygon(latlngs).addTo(map);
+
+		it("checks for the polygon outer ring nodes", function () {
+			// Westward and northward horizontal boundaries included
+			expect(polygon.contains(new L.LatLng(3, 1))).to.be.ok();
+			expect(polygon.contains(new L.LatLng(5, 1))).to.be.ok();
+			expect(polygon.contains(new L.LatLng(7, 3))).to.be.ok();
+			// Estward and southward horizontal boundaries excluded
+			expect(polygon.contains(new L.LatLng(1, 3))).to.not.be.ok();
+			expect(polygon.contains(new L.LatLng(1, 7))).to.not.be.ok();
+			expect(polygon.contains(new L.LatLng(3, 5))).to.not.be.ok();
+			expect(polygon.contains(new L.LatLng(5, 7))).to.not.be.ok();
+			expect(polygon.contains(new L.LatLng(7, 5))).to.not.be.ok();
+		});
+
+		it("checks for latlngs outside the bounding box", function () {
+			expect(polygon.contains(new L.LatLng(3, 8))).to.not.be.ok();
+			expect(polygon.contains(new L.LatLng(0, 4))).to.not.be.ok();
+			expect(polygon.contains(new L.LatLng(4, 0))).to.not.be.ok();
+			expect(polygon.contains(new L.LatLng(8, 3))).to.not.be.ok();
+		});
+
+		it("checks for latlngs in the bounding box but not in the polygon", function () {
+			expect(polygon.contains(new L.LatLng(3, 6))).to.not.be.ok();
+			expect(polygon.contains(new L.LatLng(6.5, 6.5))).to.not.be.ok();
+		});
+
+		it("checks for latlngs in the polygon", function () {
+			expect(polygon.contains(new L.LatLng(3, 2))).to.be.ok();
+			expect(polygon.contains(new L.LatLng(6, 4))).to.be.ok();
+			expect(polygon.contains(new L.LatLng(2, 4))).to.be.ok();
+			expect(polygon.contains(new L.LatLng(5, 6))).to.be.ok();
+		});
+
+		it("checks for latlngs in the polygon hole", function () {
+			expect(polygon.contains(new L.LatLng(4, 3.5))).to.not.be.ok();
+			// Hole nodes not included in the hole
+			expect(polygon.contains(new L.LatLng(3, 4))).to.be.ok();
+			expect(polygon.contains(new L.LatLng(5, 4))).to.be.ok();
+			// Hole node contained in the hole
+			expect(polygon.contains(new L.LatLng(4, 3))).to.not.be.ok();
+		});
+
+		it("checks for latlng provided as an array", function () {
+			expect(polygon.contains([3, 2])).to.be.ok();
+		});
+
+		var multi = new L.Polygon([
+			[
+				[[1, 2], [1, 4], [3, 4], [3, 2]]
+			],
+			[
+				[[6, 5], [3, 5], [3, 9], [6, 9]],
+				[[5, 6], [4, 6], [4, 8], [5, 8]]
+			]
+		]).addTo(map);
+
+		it("checks for nodes in one of the polygons outer ring", function () {
+			expect(multi.contains(new L.LatLng(3, 2))).to.be.ok();
+			expect(multi.contains(new L.LatLng(6, 5))).to.be.ok();
+			// Excluded boundaries
+			expect(multi.contains(new L.LatLng(1, 2))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(1, 4))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(3, 4))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(3, 5))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(3, 9))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(6, 9))).to.not.be.ok();
+		});
+
+		it("checks for latlngs outside the bounding box", function () {
+			expect(multi.contains(new L.LatLng(2, 1))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(0, 4))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(10, 0))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(8, 3))).to.not.be.ok();
+		});
+
+		it("checks for latlngs in the bounding box but not in one of the polygons", function () {
+			expect(multi.contains(new L.LatLng(4, 3))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(2, 5))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(3, 8))).to.not.be.ok();
+			expect(multi.contains(new L.LatLng(3, 4.5))).to.not.be.ok();
+		});
+
+		it("checks for latlngs in one of the polygons", function () {
+			expect(multi.contains(new L.LatLng(2, 3))).to.be.ok();
+			expect(multi.contains(new L.LatLng(4.5, 5.5))).to.be.ok();
+			expect(multi.contains(new L.LatLng(3.5, 7))).to.be.ok();
+			expect(multi.contains(new L.LatLng(4.5, 8.5))).to.be.ok();
+		});
+
+		it("checks for latlngs in the second polygon hole", function () {
+			expect(multi.contains(new L.LatLng(4.5, 7))).to.not.be.ok();
+			// Hole nodes not included in the hole
+			expect(multi.contains(new L.LatLng(4, 6))).to.be.ok();
+			expect(multi.contains(new L.LatLng(4, 8))).to.be.ok();
+			expect(multi.contains(new L.LatLng(5, 8))).to.be.ok();
+			// Hole node contained in the hole
+			expect(multi.contains(new L.LatLng(5, 6))).to.not.be.ok();
+		});
+
+	});
+
 });
