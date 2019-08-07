@@ -24,6 +24,11 @@ if (!Array.prototype.map) {
 	};
 }
 
+expect.Assertion.prototype.almostEqual = function (expected, delta) {
+	delta = delta || 1e-4;
+	expect(this.obj).to.be.within(expected - delta, expected + delta);
+};
+
 expect.Assertion.prototype.near = function (expected, delta) {
 	delta = delta || 1;
 	expect(this.obj.x).to
@@ -51,19 +56,6 @@ happen.at = function (what, x, y, props) {
 		button: 0
 	}, props || {}));
 };
-
-// We'll want to skip a couple of things when in PhantomJS, due to lack of CSS animations
-it.skipInPhantom = L.Browser.any3d ? it : it.skip;
-
-// Viceversa: some tests we want only to run in browsers without CSS animations.
-it.skipInNonPhantom = L.Browser.any3d ? it.skip : it;
-
-// A couple of tests need the browser to be touch-capable
-it.skipIfNotTouch = window.TouchEvent ? it : it.skip;
-
-// A couple of tests need the browser to be pointer-capable
-it.skipIfNotEdge = window.PointerEvent ? it : it.skip;
-
 
 function takeScreenshot(path) {
 	window.top.callPhantom({'render': path || 'screenshot.png'});

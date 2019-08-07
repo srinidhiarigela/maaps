@@ -1,4 +1,5 @@
 var json = require('rollup-plugin-json');
+var resolve = require('rollup-plugin-node-resolve');
 
 const outro = `var oldL = window.L;
 exports.noConflict = function() {
@@ -15,7 +16,6 @@ module.exports = function (config) {
 // 	var libSources = require(__dirname + '/../build/build.js').getFiles();
 
 	var files = [
-		"src/Leaflet.js",
 		"spec/after.js",
 		"node_modules/happen/happen.js",
 		"node_modules/prosthetic-hand/dist/prosthetic-hand.js",
@@ -57,11 +57,24 @@ module.exports = function (config) {
 		preprocessors: preprocessors,
 		rollupPreprocessor: {
 			plugins: [
+				resolve({
+					browser: true
+				}),
 				json()
 			],
 			format: 'umd',
 			name: 'L',
 			outro: outro
+		},
+
+		client: {
+			mocha: {
+				require: [
+					require.resolve('../src/Leaflet.js'),
+					require.resolve('./ui.js')
+				],
+				ui: 'leaflet-bdd'
+			}
 		},
 
 		// test results reporter to use
