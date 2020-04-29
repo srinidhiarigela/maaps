@@ -2,7 +2,10 @@ import * as DomEvent from './DomEvent';
 import * as Util from '../core/Util';
 import {Point} from '../geometry/Point';
 import * as Browser from '../core/Browser';
-
+var isBrowser = true;
+if (typeof window === 'undefined') {
+	isBrowser = false;
+}
 /*
  * @namespace DomUtil
  *
@@ -38,6 +41,9 @@ export var TRANSITION_END =
 // Returns an element given its DOM id, or returns the element itself
 // if it was passed directly.
 export function get(id) {
+	if (!isBrowser) {
+		return '';
+	}
 	return typeof id === 'string' ? document.getElementById(id) : id;
 }
 
@@ -47,8 +53,8 @@ export function get(id) {
 export function getStyle(el, style) {
 	var value = el.style[style] || (el.currentStyle && el.currentStyle[style]);
 
-	if ((!value || value === 'auto') && document.defaultView) {
-		var css = document.defaultView.getComputedStyle(el, null);
+	if ((!value || value === 'auto') && window) {
+		var css = window.getComputedStyle(el, null);
 		value = css ? css[style] : null;
 	}
 	return value === 'auto' ? null : value;
@@ -196,8 +202,10 @@ function _setOpacityIE(el, value) {
 // that is a valid style name for an element. If no such name is found,
 // it returns false. Useful for vendor-prefixed styles like `transform`.
 export function testProp(props) {
-	var style = document.documentElement.style;
-
+	var style = {};
+	if (isBrowser) {
+		style = document.documentElement.style;
+	}
 	for (var i = 0; i < props.length; i++) {
 		if (props[i] in style) {
 			return props[i];
@@ -258,7 +266,7 @@ export function getPosition(el) {
 export var disableTextSelection;
 export var enableTextSelection;
 var _userSelect;
-if ('onselectstart' in document) {
+if (isBrowser && 'onselectstart' in document) {
 	disableTextSelection = function () {
 		DomEvent.on(window, 'selectstart', DomEvent.preventDefault);
 	};
@@ -271,13 +279,16 @@ if ('onselectstart' in document) {
 
 	disableTextSelection = function () {
 		if (userSelectProperty) {
-			var style = document.documentElement.style;
+			var style = {};
+			if (!isServerSide) {
+				style = document.documentElement.style;
+			}
 			_userSelect = style[userSelectProperty];
 			style[userSelectProperty] = 'none';
 		}
 	};
 	enableTextSelection = function () {
-		if (userSelectProperty) {
+		if (userSelectProperty && !isServerSide) {
 			document.documentElement.style[userSelectProperty] = _userSelect;
 			_userSelect = undefined;
 		}
@@ -330,7 +341,7 @@ export function restoreOutline() {
 export function getSizedParentNode(element) {
 	do {
 		element = element.parentNode;
-	} while ((!element.offsetWidth || !element.offsetHeight) && element !== document.body);
+	} while (!isServerSide && (!element.offsetWidth || !element.offsetHeight) && element !== document.body);
 	return element;
 }
 
