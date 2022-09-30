@@ -2016,6 +2016,25 @@ describe("Map", function () {
 		});
 	});
 
+	describe("#mouseEventToLayerPoint", function () {
+
+		it("throws if map is not set before", function () {
+			expect(function () {
+				map.mouseEventToLayerPoint();
+			}).to.throwError();
+		});
+
+		it("returns the coordinates where the mouse event took place", function () {
+			var mouseEvent = new MouseEvent('mouseenter', {
+				clientX: 1,
+				clientY: 2
+			});
+			var p = map.mouseEventToLayerPoint(mouseEvent);
+			expect(p.x).to.be.equal(1);
+			expect(p.y).to.be.equal(2);
+		});
+	});
+
 	describe("#latLngToLayerPoint", function () {
 
 		it("throws if map is not set before", function () {
