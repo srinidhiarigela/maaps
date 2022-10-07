@@ -5,6 +5,7 @@ import * as DomUtil from '../../dom/DomUtil';
 import {Point} from '../../geometry/Point';
 import {Bounds} from '../../geometry/Bounds';
 import {LatLngBounds, toLatLngBounds as latLngBounds} from '../../geo/LatLngBounds';
+import {_castOptionToNumber} from '../../core/Util';
 
 /*
  * @class GridLayer
@@ -151,6 +152,7 @@ export var GridLayer = Layer.extend({
 
 	initialize: function (options) {
 		Util.setOptions(this, options);
+		this._validateOptions();
 	},
 
 	onAdd: function () {
@@ -913,7 +915,14 @@ export var GridLayer = Layer.extend({
 			if (!this._tiles[key].loaded) { return false; }
 		}
 		return true;
-	}
+	},
+
+	_validateOptions: function () {
+		_castOptionToNumber(this.options, 'minZoom');
+		_castOptionToNumber(this.options, 'maxZoom');
+		_castOptionToNumber(this.options, 'maxNativeZoom');
+		_castOptionToNumber(this.options, 'minNativeZoom');
+	},
 });
 
 // @factory L.gridLayer(options?: GridLayer options)

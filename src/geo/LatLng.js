@@ -1,6 +1,7 @@
 import * as Util from '../core/Util';
 import {Earth} from './crs/CRS.Earth';
 import {toLatLngBounds} from './LatLngBounds';
+import {castNumber} from '../core/Util';
 
 /* @class LatLng
  * @aka L.LatLng
@@ -28,22 +29,37 @@ import {toLatLngBounds} from './LatLngBounds';
  */
 
 export function LatLng(lat, lng, alt) {
-	if (isNaN(lat) || isNaN(lng)) {
-		throw new Error('Invalid LatLng object: (' + lat + ', ' + lng + ')');
+	if (lat instanceof LatLng) {
+		return lat;
+	}
+	if (Util.isArray(lat) && typeof lat[0] !== 'object') {
+		if (lat.length === 3) {
+			return new LatLng(lat[0], lat[1], lat[2]);
+		}
+		if (lat.length === 2) {
+			return new LatLng(lat[0], lat[1]);
+		}
+	}
+	if (typeof lat === 'object' && 'lat' in lat) {
+		var _lng = 'lng' in lat ? lat.lng : lat.lon;
+		if ('alt' in lat) {
+			return new LatLng(lat.lat, _lng, lat.alt);
+		}
+		return new LatLng(lat.lat, _lng);
 	}
 
 	// @property lat: Number
 	// Latitude in degrees
-	this.lat = +lat;
+	this.lat = castNumber(lat);
 
 	// @property lng: Number
 	// Longitude in degrees
-	this.lng = +lng;
+	this.lng = castNumber(lng);
 
 	// @property alt: Number
 	// Altitude in meters (optional)
-	if (alt !== undefined) {
-		this.alt = +alt;
+	if (arguments.length === 3 && typeof alt !== 'undefined') {
+		this.alt = castNumber(alt);
 	}
 }
 
@@ -112,27 +128,9 @@ LatLng.prototype = {
 // Expects an plain object of the form `{lat: Number, lng: Number}` or `{lat: Number, lng: Number, alt: Number}` instead.
 //  You can also use `lon` in place of `lng` in the object form.
 
-export function toLatLng(a, b, c) {
-	if (a instanceof LatLng) {
-		return a;
+export function toLatLng(lat, lng, alt) {
+	if (arguments.length === 3) {
+		return new LatLng(lat, lng, alt);
 	}
-	if (Util.isArray(a) && typeof a[0] !== 'object') {
-		if (a.length === 3) {
-			return new LatLng(a[0], a[1], a[2]);
-		}
-		if (a.length === 2) {
-			return new LatLng(a[0], a[1]);
-		}
-		return null;
-	}
-	if (a === undefined || a === null) {
-		return a;
-	}
-	if (typeof a === 'object' && 'lat' in a) {
-		return new LatLng(a.lat, 'lng' in a ? a.lng : a.lon, a.alt);
-	}
-	if (b === undefined) {
-		return null;
-	}
-	return new LatLng(a, b, c);
+	return new LatLng(lat, lng);
 }

@@ -3,6 +3,7 @@ import Browser from '../../core/Browser';
 import * as Util from '../../core/Util';
 import * as DomEvent from '../../dom/DomEvent';
 import * as DomUtil from '../../dom/DomUtil';
+import {_castOptionToNumber} from '../../core/Util';
 
 
 /*
@@ -93,6 +94,7 @@ export var TileLayer = GridLayer.extend({
 		this._url = url;
 
 		options = Util.setOptions(this, options);
+		this._validateOptions();
 
 		// detecting retina displays, adjusting tileSize and zoom levels
 		if (options.detectRetina && Browser.retina && options.maxZoom > 0) {
@@ -272,6 +274,11 @@ export var TileLayer = GridLayer.extend({
 		}
 
 		return GridLayer.prototype._tileReady.call(this, coords, err, tile);
+	},
+
+	_validateOptions: function () {
+		_castOptionToNumber(this.options, 'zoomOffset');
+		return GridLayer.prototype._validateOptions.call(this);
 	}
 });
 

@@ -222,3 +222,32 @@ export function cancelAnimFrame(id) {
 		cancelFn.call(window, id);
 	}
 }
+
+function isNumeric(str) { // https://stackoverflow.com/a/175787/2520247
+	return !isNaN(str) && !isNaN(parseFloat(str));
+}
+
+// @function castNumber(data: Number|String): Number
+// Makes sure that passed `data` is a number, and returns it.
+// If string is passed - converts it to number trying to avoid coercion pitfalls.
+// Throws error in case of any failure.
+export function castNumber(a) {
+	if (typeof a === 'string' && isNumeric(a)) {
+		a = +a;
+	}
+	if ((typeof a === 'number' || a instanceof Number) && (isFinite(a) || a === Infinity || a === -Infinity)) {
+		return a;
+	}
+	throw new Error('Number expected. Value: \'' + a + '\'');
+}
+
+// makes sure that a option is a number
+export function _castOptionToNumber(options, optionName) {
+	if (options && options[optionName]) {
+		try {
+			options[optionName] = castNumber(options[optionName]);
+		} catch (e) {
+			throw new Error('Number expected for \'' + optionName + '\'. Value: \'' + options[optionName] + '\'');
+		}
+	}
+}
