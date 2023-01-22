@@ -561,7 +561,7 @@ describe('GridLayer', () => {
 		}
 		*/
 
-		// animationFrame helper, just runs requestAnimFrame() a given number of times
+		// animationFrame helper, just runs requestAnimationFrame() a given number of times
 		function runFrames(n) {
 			return _runFrames(n)();
 		}
@@ -571,7 +571,7 @@ describe('GridLayer', () => {
 				return function () {
 					clock.tick(40); // 40msec/frame ~= 25fps
 					map.fire('_frame');
-					L.Util.requestAnimFrame(_runFrames(n - 1));
+					requestAnimationFrame(_runFrames(n - 1));
 				};
 			} else {
 				return L.Util.falseFn;
@@ -593,7 +593,7 @@ describe('GridLayer', () => {
 				expect(counts.tileunload).to.be(0);
 
 				// Wait for a frame to let _updateOpacity starting.
-				L.Util.requestAnimFrame(() => {
+				requestAnimationFrame(() => {
 					// Wait > 250msec for the tile fade-in animation to complete,
 					// which triggers the tile pruning
 					clock.tick(300);
@@ -630,7 +630,7 @@ describe('GridLayer', () => {
 						// so the remaining 4 tiles from z10 can then be pruned.
 						// However we have skipped any pruning from _updateOpacity,
 						// so we will have to rely on the setTimeout from _tileReady.
-						L.Util.requestAnimFrame(() => {
+						requestAnimationFrame(() => {
 							// Wait > 250msec for the tile fade-in animation to complete,
 							// which triggers the tile pruning
 							clock.tick(300);
@@ -644,7 +644,7 @@ describe('GridLayer', () => {
 
 					map.setZoom(11, {animate: true});
 					// Animation (and new tiles loading) starts after 1 frame.
-					L.Util.requestAnimFrame(() => {
+					requestAnimationFrame(() => {
 						// 16 extra tiles from z11 being loaded. Total 16 + 16 = 32.
 						expect(counts.tileloadstart).to.be(32);
 					});
@@ -670,7 +670,7 @@ describe('GridLayer', () => {
 
 					// In this particular scenario, the tile unloads happen in the
 					// next render frame after the grid's 'load' event.
-					L.Util.requestAnimFrame(() => {
+					requestAnimationFrame(() => {
 						expect(counts.tileloadstart).to.be(32);
 						expect(counts.tileload).to.be(32);
 						expect(counts.tileunload).to.be(16);
@@ -698,7 +698,7 @@ describe('GridLayer', () => {
 				expect(counts.tileunload).to.be(0);
 
 				// Wait for a frame to let _updateOpacity starting.
-				L.Util.requestAnimFrame(() => {
+				requestAnimationFrame(() => {
 					// Wait > 250msec for the tile fade-in animation to complete,
 					// which triggers the tile pruning
 					clock.tick(300);
@@ -735,7 +735,7 @@ describe('GridLayer', () => {
 							// Wait for a frame for next _updateOpacity to prune
 							// all 16 tiles from z11 which are now covered by the
 							// 4 central active tiles of z10.
-							L.Util.requestAnimFrame(() => {
+							requestAnimationFrame(() => {
 								expect(counts.tileunload).to.be(16);
 								done();
 							});
@@ -745,7 +745,7 @@ describe('GridLayer', () => {
 
 				map.setZoom(10, {animate: true});
 				// Animation (and new tiles loading) starts after 1 frame.
-				L.Util.requestAnimFrame(() => {
+				requestAnimationFrame(() => {
 					// We're one frame into the zoom animation, there are
 					// 16 tiles for z11 plus 4 tiles for z10 covering the
 					// bounds at the *beginning* of the zoom-*out* anim
@@ -770,7 +770,7 @@ describe('GridLayer', () => {
 
 					// In this particular scenario, the tile unloads happen in the
 					// next render frame after the grid's 'load' event.
-					L.Util.requestAnimFrame(() => {
+					requestAnimationFrame(() => {
 						expect(counts.tileloadstart).to.be(32);
 						expect(counts.tileload).to.be(32);
 						expect(counts.tileunload).to.be(16);
@@ -877,7 +877,7 @@ describe('GridLayer', () => {
 				expect(counts.tileunload).to.be(0);
 
 				// Wait for a frame to let _updateOpacity starting.
-				L.Util.requestAnimFrame(() => {
+				requestAnimationFrame(() => {
 
 					// Wait > 250msec for the tile fade-in animation to complete,
 					// which triggers the tile pruning
@@ -894,7 +894,7 @@ describe('GridLayer', () => {
 
 						// Wait for a frame to let _updateOpacity starting
 						// It will prune the 12 tiles outside the new bounds.
-						L.Util.requestAnimFrame(() => {
+						requestAnimationFrame(() => {
 							expect(counts.tileunload).to.be(12);
 							done();
 						});
@@ -933,7 +933,7 @@ describe('GridLayer', () => {
 
 					// Wait for a frame to let _updateOpacity starting
 					// It will prune the 12 tiles outside the new bounds.
-					L.Util.requestAnimFrame(() => {
+					requestAnimationFrame(() => {
 						expect(counts.tileunload).to.be(12);
 
 						grid.once('load', () => {
@@ -941,7 +941,7 @@ describe('GridLayer', () => {
 							expect(counts.tileload).to.be(40);
 
 							// Wait an extra frame for the tile pruning to happen.
-							L.Util.requestAnimFrame(() => {
+							requestAnimationFrame(() => {
 								expect(counts.tileunload).to.be(24);
 								done();
 							});
