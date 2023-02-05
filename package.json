@@ -31,8 +31,8 @@
     "uglify-js": "^3.17.1",
     "ui-event-simulator": "^1.0.0"
   },
+  "type": "module",
   "main": "dist/leaflet-src.js",
-  "module": "dist/leaflet-src.esm.js",
   "style": "dist/leaflet.css",
   "files": [
     "dist",
@@ -42,13 +42,13 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "docs": "node ./build/docs.mjs && node ./build/integrity.mjs",
-    "test": "karma start ./spec/karma.conf.js",
+    "docs": "node ./build/docs.js && node ./build/integrity.js",
+    "test": "karma start ./spec/karma.conf.cjs",
     "build": "npm run rollup && npm run uglify",
-    "lint": "eslint . --ext js,mjs,cjs",
+    "lint": "eslint . --ext js,cjs",
     "lintfix": "npm run lint -- --fix",
-    "rollup": "rollup -c build/rollup-config.mjs",
-    "watch": "rollup -w -c build/rollup-config.mjs",
+    "rollup": "rollup -c build/rollup-config.js",
+    "watch": "rollup -w -c build/rollup-config.js",
     "uglify": "uglifyjs dist/leaflet-src.js -c -m -o dist/leaflet.js --source-map filename=dist/leaflet.js.map --source-map content=dist/leaflet-src.js.map --source-map url=leaflet.js.map --comments",
     "bundlemon": "bundlemon --subProject js --defaultCompression none && bundlemon --subProject js-gzip --defaultCompression gzip",
     "serve": "cd docs && bundle exec jekyll serve",
