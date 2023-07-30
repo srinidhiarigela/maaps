@@ -1643,6 +1643,7 @@ export const Map = Evented.extend({
 	},
 
 	_destroyAnimProxy() {
+		DomEvent.off(this._proxy, 'transitionend', this._catchTransitionEnd, this);
 		this._proxy.remove();
 		this.off('load moveend', this._animMoveEnd, this);
 		delete this._proxy;
